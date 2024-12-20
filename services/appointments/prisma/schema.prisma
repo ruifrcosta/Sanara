@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Appointment {
+  id          String            @id @default(cuid())
+  patientId   String
+  doctorId    String
+  clinicId    String
+  date        DateTime
+  status      AppointmentStatus @default(SCHEDULED)
+  type        AppointmentType
+  notes       String?
+  symptoms    String?
+  diagnosis   String?
+  treatment   String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  cancelledAt DateTime?
+  reminders   Reminder[]
+
+  @@map("appointments")
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([clinicId])
+  @@index([date])
+}
+
+model Reminder {
+  id            String    @id @default(cuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  type          ReminderType
+  sentAt        DateTime?
+  scheduledFor  DateTime
+  status        ReminderStatus @default(PENDING)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("reminders")
+  @@index([appointmentId])
+  @@index([scheduledFor])
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum AppointmentType {
+  CONSULTATION
+  FOLLOW_UP
+  EXAMINATION
+  PROCEDURE
+  EMERGENCY
+}
+
+enum ReminderType {
+  EMAIL
+  SMS
+  WHATSAPP
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  FAILED
+} 

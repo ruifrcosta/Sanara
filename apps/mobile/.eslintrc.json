@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "@react-native",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "prettier"],
+  "rules": {
+    "prettier/prettier": "error",
+    "no-unused-vars": "warn",
+    "no-console": "warn",
+    "react/react-in-jsx-scope": "off"
+  }
+} 

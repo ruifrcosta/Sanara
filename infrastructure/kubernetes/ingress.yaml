@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - api.sanara.com
+    secretName: sanara-tls
+  rules:
+  - host: api.sanara.com
+    http:
+      paths:
+      - path: /auth
+        pathType: Prefix
+        backend:
+          service:
+            name: auth-service
+            port:
+              number: 80
+      - path: /appointments
+        pathType: Prefix
+        backend:
+          service:
+            name: appointments-service
+            port:
+              number: 80
+      - path: /patients
+        pathType: Prefix
+        backend:
+          service:
+            name: patients-service
+            port:
+              number: 80
+      - path: /analytics
+        pathType: Prefix
+        backend:
+          service:
+            name: analytics-service
+            port:
+              number: 80 

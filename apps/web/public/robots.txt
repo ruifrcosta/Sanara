@@ -1,0 +1,22 @@
+# www.robotstxt.org
+
+User-agent: *
+Allow: /
+Allow: /telemedicina
+Allow: /farmacia
+Allow: /seguros
+Allow: /sobre
+Allow: /contato
+Allow: /blog
+Allow: /ajuda
+
+# Disallow admin and private routes
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api
+Disallow: /private
+Disallow: /_next
+Disallow: /*?*
+
+# Sitemap
+Sitemap: https://sanara.com/sitemap.xml 

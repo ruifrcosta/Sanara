@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Payment {
+  id              String    @id @default(uuid())
+  userId          String
+  orderId         String
+  amount          Float
+  currency        String    @default("BRL")
+  status          PaymentStatus
+  paymentMethod   PaymentMethod
+  paymentIntentId String?
+  stripeCustomerId String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  refundId        String?
+  refundAmount    Float?
+  refundReason    String?
+  metadata        Json?
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([status])
+}
+
+model PaymentMethod {
+  id              String    @id @default(uuid())
+  userId          String
+  type            PaymentMethodType
+  brand           String?
+  last4           String?
+  expiryMonth     Int?
+  expiryYear      Int?
+  isDefault       Boolean   @default(false)
+  stripePaymentMethodId String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum PaymentMethodType {
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  BOLETO
+} 

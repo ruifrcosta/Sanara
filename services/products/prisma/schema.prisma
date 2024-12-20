@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id            String    @id @default(uuid())
+  name          String
+  description   String
+  price         Float
+  comparePrice  Float?
+  sku           String    @unique
+  barcode       String?
+  status        ProductStatus @default(ACTIVE)
+  type          ProductType
+  category      Category   @relation(fields: [categoryId], references: [id])
+  categoryId    String
+  brand         Brand?     @relation(fields: [brandId], references: [id])
+  brandId       String?
+  images        ProductImage[]
+  variants      ProductVariant[]
+  inventory     Inventory?
+  attributes    ProductAttribute[]
+  tags          Tag[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([status])
+  @@map("products")
+}
+
+model ProductVariant {
+  id            String    @id @default(uuid())
+  productId     String
+  name          String
+  sku           String    @unique
+  price         Float
+  comparePrice  Float?
+  inventory     Int       @default(0)
+  options       Json      // {color: "red", size: "M", etc}
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+model Category {
+  id            String    @id @default(uuid())
+  name          String
+  slug          String    @unique
+  description   String?
+  parentId      String?
+  parent        Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children      Category[] @relation("CategoryHierarchy")
+  products      Product[]
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([parentId])
+  @@map("categories")
+}
+
+model Brand {
+  id            String    @id @default(uuid())
+  name          String
+  slug          String    @unique
+  description   String?
+  logo          String?
+  products      Product[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("brands")
+}
+
+model ProductImage {
+  id            String    @id @default(uuid())
+  productId     String
+  url           String
+  alt           String?
+  position      Int       @default(0)
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model Inventory {
+  id            String    @id @default(uuid())
+  productId     String    @unique
+  quantity      Int       @default(0)
+  lowStock      Int       @default(5)
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("inventories")
+}
+
+model ProductAttribute {
+  id            String    @id @default(uuid())
+  productId     String
+  name          String
+  value         String
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([productId, name])
+  @@index([productId])
+  @@map("product_attributes")
+}
+
+model Tag {
+  id            String    @id @default(uuid())
+  name          String    @unique
+  products      Product[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("tags")
+}
+
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum ProductType {
+  PHYSICAL
+  DIGITAL
+  SERVICE
+} 
