@@ -112,7 +112,7 @@ Contribuições são bem-vindas! Para contribuir:
 - Consulte a documentação no repositório ou entre em contato com os autores.
 
 ## 📞 Contato | Contact
-Para mais informações, entre em contato com [SeuNome](mailto:seuemail@example.com).
+Para mais informações, entre em contato com [Rui Costa](ruic42@gmail.com).
 
 ## 🌟 Demonstração | Demo
 Para ver o projeto em ação, acesse [https://sanara.com](https://sanara.com).
