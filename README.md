@@ -82,7 +82,7 @@ Este projeto utiliza as seguintes tecnologias:
 Utilizamos [SemVer](http://semver.org/) para controle de versão. Para ver as versões disponíveis, consulte as tags no repositório.
 
 ## ✒️ Autores | Authors
-- **Desenvolvedor Inicial** - *Trabalho Inicial* - [SeuNome](https://github.com/seunome)
+- **Desenvolvedor Inicial** - *Trabalho Inicial* - [Rui Costa](ruic42@gmail.com).
 
 ## 📄 Licença | License
 Este projeto está sob a licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para detalhes.
