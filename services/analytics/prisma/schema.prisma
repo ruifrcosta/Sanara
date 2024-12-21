@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ClinicMetrics {
+  id                String   @id @default(cuid())
+  clinicId          String
+  date              DateTime
+  totalAppointments Int
+  completedAppointments Int
+  cancelledAppointments Int
+  noShowAppointments Int
+  newPatients       Int
+  revenue           Float
+  satisfaction      Float
+  averageWaitTime   Int     // in minutes
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("clinic_metrics")
+  @@unique([clinicId, date])
+  @@index([clinicId])
+  @@index([date])
+}
+
+model DoctorMetrics {
+  id                String   @id @default(cuid())
+  doctorId          String
+  clinicId          String
+  date              DateTime
+  totalAppointments Int
+  completedAppointments Int
+  cancelledAppointments Int
+  noShowAppointments Int
+  averageRating     Float
+  patientFeedback   Int
+  revenue           Float
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("doctor_metrics")
+  @@unique([doctorId, date])
+  @@index([doctorId])
+  @@index([clinicId])
+  @@index([date])
+}
+
+model PatientFeedback {
+  id            String   @id @default(cuid())
+  appointmentId String   @unique
+  patientId     String
+  doctorId      String
+  clinicId      String
+  rating        Int      // 1-5
+  comment       String?
+  category      FeedbackCategory
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("patient_feedback")
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([clinicId])
+}
+
+enum FeedbackCategory {
+  GENERAL
+  WAIT_TIME
+  STAFF
+  FACILITY
+  TREATMENT
+  COMMUNICATION
+} 

@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Consultation {
+  id              String    @id @default(uuid())
+  appointmentId   String    @unique
+  userId          String
+  professionalId  String
+  startTime       DateTime
+  endTime         DateTime?
+  status          String    // WAITING, IN_PROGRESS, COMPLETED, CANCELLED
+  type            String    // VIDEO_CALL, CHAT
+  roomId          String?   // Twilio room ID for video calls
+  transcript      String?   // AI-generated transcript
+  summary         String?   // AI-generated summary
+  notes           String?   // Professional's notes
+  chatMessages    ChatMessage[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("consultations")
+}
+
+model ChatMessage {
+  id              String       @id @default(uuid())
+  consultationId  String
+  senderId        String      // User ID or Professional ID
+  senderType      String      // USER, PROFESSIONAL
+  content         String
+  timestamp       DateTime     @default(now())
+  consultation    Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+model AIAssistant {
+  id              String    @id @default(uuid())
+  consultationId  String
+  type            String    // TRANSCRIPTION, SUMMARY, ANALYSIS
+  content         String
+  status          String    // PENDING, COMPLETED, FAILED
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("ai_assistants")
+} 

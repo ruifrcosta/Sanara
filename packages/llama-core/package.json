@@ -1,0 +1,17 @@
+{
+  "name": "@sanara/llama-core",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "python src/main.py",
+    "test": "pytest",
+    "lint": "pylint src tests"
+  },
+  "dependencies": {
+    "llama-cpp-python": "^0.2.0"
+  },
+  "devDependencies": {
+    "pytest": "^7.4.0",
+    "pylint": "^2.17.0"
+  }
+} 

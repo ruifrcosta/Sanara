@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id                String         @id @default(cuid())
+  userId            String         @unique
+  clinicId          String
+  name              String
+  dateOfBirth       DateTime
+  gender            Gender
+  bloodType         BloodType?
+  phone             String
+  email             String
+  address           String
+  emergencyContact  String?
+  allergies         String[]
+  medicalConditions String[]
+  medications       String[]
+  notes             String?
+  status            PatientStatus  @default(ACTIVE)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  medicalRecords    MedicalRecord[]
+
+  @@map("patients")
+  @@index([userId])
+  @@index([clinicId])
+}
+
+model MedicalRecord {
+  id          String    @id @default(cuid())
+  patientId   String
+  patient     Patient   @relation(fields: [patientId], references: [id])
+  doctorId    String
+  type        RecordType
+  date        DateTime
+  description String
+  diagnosis   String?
+  treatment   String?
+  prescription String?
+  attachments String[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("medical_records")
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([date])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+}
+
+enum PatientStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum RecordType {
+  CONSULTATION
+  EXAMINATION
+  PROCEDURE
+  LAB_RESULT
+  VACCINATION
+  PRESCRIPTION
+} 

@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pharmacy {
+  id              String    @id @default(uuid())
+  name            String
+  cnpj            String    @unique
+  email           String    @unique
+  phone           String
+  address         Address?
+  status          PharmacyStatus @default(PENDING)
+  operatingHours  OperatingHours[]
+  inventory       PharmacyInventory[]
+  orders          PharmacyOrder[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("pharmacies")
+}
+
+model Address {
+  id            String    @id @default(uuid())
+  pharmacyId    String    @unique
+  street        String
+  number        String
+  complement    String?
+  neighborhood  String
+  city          String
+  state         String
+  country       String
+  zipCode       String
+  latitude      Float?
+  longitude     Float?
+  pharmacy      Pharmacy  @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
+  @@map("addresses")
+}
+
+model OperatingHours {
+  id          String    @id @default(uuid())
+  pharmacyId  String
+  dayOfWeek   Int       // 0-6 (Sunday-Saturday)
+  openTime    String    // HH:mm format
+  closeTime   String    // HH:mm format
+  isOpen      Boolean   @default(true)
+  pharmacy    Pharmacy  @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+
+  @@unique([pharmacyId, dayOfWeek])
+  @@map("operating_hours")
+}
+
+model PharmacyInventory {
+  id          String    @id @default(uuid())
+  pharmacyId  String
+  productId   String
+  quantity    Int
+  price       Float
+  status      InventoryStatus @default(ACTIVE)
+  pharmacy    Pharmacy  @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([pharmacyId, productId])
+  @@index([productId])
+  @@map("pharmacy_inventory")
+}
+
+model PharmacyOrder {
+  id          String    @id @default(uuid())
+  pharmacyId  String
+  orderId     String    @unique
+  status      PharmacyOrderStatus @default(PENDING)
+  items       PharmacyOrderItem[]
+  pharmacy    Pharmacy  @relation(fields: [pharmacyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([pharmacyId])
+  @@map("pharmacy_orders")
+}
+
+model PharmacyOrderItem {
+  id              String    @id @default(uuid())
+  pharmacyOrderId String
+  productId       String
+  quantity        Int
+  price           Float
+  status          PharmacyOrderItemStatus @default(PENDING)
+  pharmacyOrder   PharmacyOrder @relation(fields: [pharmacyOrderId], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([pharmacyOrderId])
+  @@map("pharmacy_order_items")
+}
+
+enum PharmacyStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum InventoryStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+}
+
+enum PharmacyOrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  READY_FOR_PICKUP
+  COMPLETED
+  CANCELLED
+}
+
+enum PharmacyOrderItemStatus {
+  PENDING
+  CONFIRMED
+  OUT_OF_STOCK
+  CANCELLED
+} 
